@@ -4,7 +4,7 @@ A modern web UI for managing Ansible playbooks, deployments, and infrastructure 
 
 ## 📖 Interactive Documentation
 
-**🌟 [View Interactive Documentation](./docs/index.html) 🌟**
+**🌟 [View Interactive Documentation](https://sohaib1khan.github.io/Semaphore_Ansible_Controller/) 🌟**
 
 For a better reading experience with interactive examples, code highlighting, and visual guides, check out our interactive documentation website.
 
@@ -286,7 +286,7 @@ kubectl get secrets
 
 ## 🔗 Useful Links
 
-- **📖 [Interactive Documentation](./docs/index.html)** - Enhanced docs with visual guides
+- **📖 [Interactive Documentation](https://sohaib1khan.github.io/Semaphore_Ansible_Controller/)** - Enhanced docs with visual guides
 - [Semaphore UI Official Documentation](https://docs.semaphoreui.com/)
 - [Ansible Documentation](https://docs.ansible.com/)
 - [Kubernetes Documentation](https://kubernetes.io/docs/)
