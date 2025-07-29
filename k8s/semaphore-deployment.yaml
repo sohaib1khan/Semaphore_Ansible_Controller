@@ -1,3 +1,5 @@
+
+---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -7,38 +9,52 @@ spec:
     storage: 1Gi
   accessModes:
     - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
   hostPath:
     path: /home/k8server/Semaphore_Ansible_Controller/semaphore-data
+    type: DirectoryOrCreate
+
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: semaphore-pvc
+  namespace: semaphore
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
+  storageClassName: local-storage
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: semaphore
+  namespace: semaphore
 spec:
   type: LoadBalancer
-  loadBalancerIP: 192.168.1.250  # Use your MetalLB-assigned IP
+  loadBalancerIP: 192.168.1.250
   ports:
     - port: 3000
       targetPort: 3000
+      protocol: TCP
   selector:
     app: semaphore
+
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: semaphore
+  namespace: semaphore
 spec:
+  replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: semaphore
@@ -47,38 +63,111 @@ spec:
       labels:
         app: semaphore
     spec:
+      # Pod-level security context (fsGroup goes here)
+      securityContext:
+        fsGroup: 1001
+        
+      # Fix permissions with init container
+      initContainers:
+        - name: fix-permissions
+          image: busybox:1.35
+          command: ['sh', '-c']
+          args:
+            - |
+              echo "Fixing permissions for Semaphore data directory..."
+              chown -R 1001:1001 /etc/semaphore
+              chmod -R 755 /etc/semaphore
+              mkdir -p /tmp/semaphore
+              chown -R 1001:1001 /tmp/semaphore
+              chmod -R 755 /tmp/semaphore
+              echo "Permissions fixed!"
+          volumeMounts:
+            - name: semaphore-data
+              mountPath: /etc/semaphore
+            - name: tmp-dir
+              mountPath: /tmp/semaphore
+          securityContext:
+            runAsUser: 0  # Run as root to fix permissions
+            
       containers:
         - name: semaphore
           image: semaphoreui/semaphore:latest
+          # Container-level security context (NO fsGroup here)
+          securityContext:
+            runAsUser: 1001
+            runAsGroup: 1001
           ports:
             - containerPort: 3000
           env:
+            # Database configuration (using BoltDB for simplicity)
             - name: SEMAPHORE_DB_DIALECT
-              value: postgres
-            - name: SEMAPHORE_DB_HOST
-              value: postgres
-            - name: SEMAPHORE_DB_PORT
-              value: "5432"
-            - name: SEMAPHORE_DB_USER
-              value: semaphore
-            - name: SEMAPHORE_DB_PASS
-              value: semaphore123
-            - name: SEMAPHORE_DB
-              value: semaphore
+              value: bolt
+            - name: SEMAPHORE_DB_PATH
+              value: /etc/semaphore/database.boltdb
+            
+            # Admin user configuration
             - name: SEMAPHORE_ADMIN
               value: admin
             - name: SEMAPHORE_ADMIN_PASSWORD
               value: admin123
             - name: SEMAPHORE_ADMIN_NAME
-              value: "Admin"
+              value: "Admin User"
             - name: SEMAPHORE_ADMIN_EMAIL
-              value: admin@example.com
+              value: admin@localhost
+            
+            # Semaphore configuration
+            - name: SEMAPHORE_CONFIG_PATH
+              value: /etc/semaphore
+            - name: SEMAPHORE_TMP_PATH
+              value: /tmp/semaphore
+            
+            # ⭐ FIX THE PORT ISSUE - Override Kubernetes auto-generated env var
             - name: SEMAPHORE_PORT
-              value: "3000"
+              value: ":3000"
+            - name: SEMAPHORE_INTERFACE
+              value: "0.0.0.0"
+            
+            # Security keys (you can change these)
+            - name: SEMAPHORE_ACCESS_KEY_ENCRYPTION
+              value: gs72mPntFATGJs9qK1nnBHtjaiHW3Q4Q
+            - name: SEMAPHORE_COOKIE_HASH
+              value: gs72mPntFATGJs9qK1nnBHtjaiHW3Q4Q
+            - name: SEMAPHORE_COOKIE_ENCRYPTION
+              value: gs72mPntFATGJs9qK1nnBHtjaiHW3Q4Q
+            
           volumeMounts:
             - name: semaphore-data
               mountPath: /etc/semaphore
+            - name: tmp-dir
+              mountPath: /tmp/semaphore
+          
+          livenessProbe:
+            httpGet:
+              path: /api/ping
+              port: 3000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+          
+          readinessProbe:
+            httpGet:
+              path: /api/ping
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+              
       volumes:
         - name: semaphore-data
           persistentVolumeClaim:
             claimName: semaphore-pvc
+        - name: tmp-dir
+          emptyDir: {}
