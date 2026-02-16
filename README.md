@@ -2,13 +2,13 @@
 
 A modern web UI for managing Ansible playbooks, deployments, and infrastructure automation. This project provides both **Docker** and **Kubernetes** deployment options for Semaphore UI.
 
-## 📖 Interactive Documentation
+## Interactive Documentation
 
 **🌟 [View Interactive Documentation](https://sohaib1khan.github.io/Semaphore_Ansible_Controller/) 🌟**
 
 For a better reading experience with interactive examples, code highlighting, and visual guides, check out our interactive documentation website.
 
-## 🎯 Overview
+## Overview
 
 **Semaphore UI** is a powerful web interface that makes Ansible management easy and intuitive. Perfect for:
 - **DevOps Engineers** learning infrastructure automation
@@ -16,7 +16,7 @@ For a better reading experience with interactive examples, code highlighting, an
 - **Homelab enthusiasts** running automation on Proxmox/K3s clusters
 - **Project management** of playbooks, inventories, and deployment tasks
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 ├── docker/                     # Docker deployment
@@ -28,7 +28,7 @@ For a better reading experience with interactive examples, code highlighting, an
 └── README.md                  # This documentation
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Option 1: Docker Deployment (Recommended for Development)
 
@@ -81,28 +81,28 @@ kubectl apply -f semaphore-deployment.yaml
 - **Username:** admin
 - **Password:** admin123
 
-## 📋 Features
+## Features
 
-### 🎛️ Web Interface
+### Web Interface
 - **Modern UI** for Ansible management
 - **Project organization** with templates and tasks
 - **Real-time execution** logs and monitoring
 - **User management** and access control
 - **Mobile-responsive** design
 
-### 🗄️ Database Support
+### Database Support
 - **Docker:** MySQL 8.0 with persistent storage
 - **Kubernetes:** PostgreSQL 14 with persistent volumes
 - **Data persistence** across container restarts
 
-### 🔧 DevOps Integration
+### DevOps Integration
 - **Git repository** integration for playbooks
 - **SSH key management** for target servers
 - **Environment variables** and secret management
 - **Scheduling** and automation capabilities
 - **REST API** for programmatic access
 
-## 🏠 Homelab Integration
+## Homelab Integration
 
 ### Perfect for K3s Clusters
 - **MetalLB LoadBalancer** support for clean IPs
@@ -115,7 +115,7 @@ kubectl apply -f semaphore-deployment.yaml
 - **Automated deployments** across your homelab
 - **Infrastructure as Code** for your environment
 
-## 📁 Data Storage
+## Data Storage
 
 ### Docker Deployment
 ```
@@ -133,7 +133,7 @@ kubectl apply -f semaphore-deployment.yaml
 └── semaphore-data/ # Semaphore configuration
 ```
 
-## 🔒 Security Configuration
+## Security Configuration
 
 ### Default Credentials
 - **Username:** admin
@@ -147,7 +147,7 @@ kubectl apply -f semaphore-deployment.yaml
 4. **Use secrets management** for sensitive data
 5. **Regular backups** of database and configuration
 
-## 🛠️ Management Commands
+## Management Commands
 
 ### Docker
 ```bash
@@ -180,7 +180,7 @@ kubectl scale deployment semaphore --replicas=2
 kubectl set image deployment/semaphore semaphore=semaphoreui/semaphore:latest
 ```
 
-## 📚 Common Use Cases
+## Common Use Cases
 
 ### 1. **Server Management**
 ```yaml
@@ -218,7 +218,7 @@ kubectl set image deployment/semaphore semaphore=semaphoreui/semaphore:latest
         state: present
 ```
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -267,7 +267,7 @@ docker-compose logs semaphore-db
 kubectl get secrets
 ```
 
-## 🎓 Learning Resources
+## Learning Resources
 
 ### DevOps Skills Development
 - **Ansible automation** best practices
